@@ -1,0 +1,8 @@
+{
+    "error_code": 403,
+    "error_type": "no_access",
+    "error_message": "You do not have permission to access this resource.",
+    "error_id": "${ ErrorID }",
+    "error_class": "ServiceRequestAuthorizationError",
+    "error_title": null
+}

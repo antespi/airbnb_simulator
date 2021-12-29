@@ -1,0 +1,19 @@
+#----------------------------------------------------------------------
+# Simlet-specific configuration.
+#----------------------------------------------------------------------
+
+request:
+- where: uriPath
+  equals: "/stub/file/logo"
+
+- method: GET
+
+
+response:
+  from: stub
+  status: 200
+  headers:
+  - "Content-Type: image/png"
+  body:
+    type: binary
+    file: "${simlet.path}/favicon-16x16.png"

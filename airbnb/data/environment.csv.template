@@ -1,0 +1,2 @@
+EnvironmentID,UserID,ClientID,AuthToken,RefreshToken
+default,__YOUR_USER_ID__,__YOUR_CLIENT_ID__,__YOUR_ACCESS_TOKEN__,__YOUR_REFRESH_TOKEN__

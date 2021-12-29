@@ -1,0 +1,70 @@
+{
+    "availability_rule": {
+        "listing_id": ${ ListingId },
+        "booking_lead_time": {
+            "hours": 0,
+            "allow_request_to_book": 1
+        },
+        "day_of_week_check_in": [
+            {
+                "day_of_week": 0
+            },
+            {
+                "day_of_week": 1
+            },
+            {
+                "day_of_week": 2
+            },
+            {
+                "day_of_week": 3
+            },
+            {
+                "day_of_week": 4
+            },
+            {
+                "day_of_week": 5
+            },
+            {
+                "day_of_week": 6
+            }
+        ],
+        "day_of_week_check_out": [
+            {
+                "day_of_week": 0
+            },
+            {
+                "day_of_week": 1
+            },
+            {
+                "day_of_week": 2
+            },
+            {
+                "day_of_week": 3
+            },
+            {
+                "day_of_week": 4
+            },
+            {
+                "day_of_week": 5
+            },
+            {
+                "day_of_week": 6
+            }
+        ],
+        "day_of_week_min_nights": [],
+        "default_max_nights": 365,
+        "default_min_nights": 1,
+        "max_days_notice": {
+            "days": 365
+        },
+        "min_days_notice": {
+            "days": -1
+        },
+        "turnover_days": {
+            "days": 0
+        },
+        "seasonal_min_nights": null,
+        "allow_rtb_above_max_nights": false,
+        "listing_id_str": "${ ListingId }"
+    }
+}

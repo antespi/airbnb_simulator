@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  airbnb:
+    image: apimastery/apisimulator:1.9
+    environment:
+      APISIMULATOR_LOG_LEVEL: debug
+      APISIMULATOR_ACCESS_LOG: file
+    ports:
+      - 6190:6190
+      - 6090:6090
+    volumes:
+      - ./airbnb:/apisimulator/apisimulator-http-1.9/airbnb
+    command: apisimulator start /apisimulator/apisimulator-http-1.9/airbnb

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="log_filename">${sys:apirecorder.log.fileSpec:-${env:APIRECORDER_LOG_FILE_SPEC:-.}/apirecorder.log}</Property>
+    
+    <!-- The square brackets in [%m] help with multi-line messages -->
+    <Property name="log_pattern">%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}|%p|${sys:jvm.pid}|%t|[%m]%n</Property>
+  </Properties>
+
+  <Appenders>
+    <ScriptAppenderSelector name="LOG_APPENDER_SELECTOR">
+      <Script language="groovy"><![CDATA[
+        logTarget = System.getenv("APIRECORDER_LOG");
+        if (logTarget == null || logTarget.trim().length() <= 0) { 
+          logTarget = System.getProperty("apirecorder.log");
+        }
+        if ("stdout".equalsIgnoreCase(logTarget)) { 
+          return "log_stdout";
+        }
+        if ("".equalsIgnoreCase(logTarget)) { 
+          return "log_nop";
+        }
+        return "log_file";
+      ]]>
+      </Script>
+      <AppenderSet>
+        <Null name="log_nop" />
+
+        <!--
+          Tips:
+          - Add ".gz" to the end of the filePattern to have the files gzip-ed.
+          - Timestamp in the name: filePattern="apirecorder.%d{yyyy-MM-dd-HH-mm-ss}.log"
+          - interval="86400" => 24 hours because most specific time unit in the date
+            pattern is seconds.
+        -->
+        <RollingFile name="log_file" fileName="${log_filename}"
+          filePattern="${log_filename}.%i" immediateFlush="false" append="false">
+          <PatternLayout>
+            <pattern>${log_pattern}</pattern>
+          </PatternLayout>
+          <Policies>
+            <OnStartupTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="100MB" />
+            <!-- Add this only if filePattern has timestamp
+              <TimeBasedTriggeringPolicy interval="86400" modulate="true" />
+            -->
+          </Policies>
+          <DefaultRolloverStrategy max="5" />
+        </RollingFile>
+
+        <Console name="log_stdout" target="SYSTEM_OUT">
+          <PatternLayout>
+            <pattern>${log_pattern}</pattern>
+          </PatternLayout>
+        </Console>
+      </AppenderSet>
+    </ScriptAppenderSelector>
+
+    <!--
+      Per the online doc, "...The Async Appender should be configured after
+      the appenders it references. This will allow it to shutdown properly"
+    -->
+    <Async name="LOG_APPENDER" bufferSize="256">
+      <AppenderRef ref="LOG_APPENDER_SELECTOR" />
+    </Async>
+  </Appenders>
+
+  <Loggers>
+    <!-- <Logger name="com.apimastery.config" level="debug"/> -->
+    <!-- <Logger name="com.apimastery.config" level="info"/> -->
+    <!-- <Logger name="com.apimastery.config" level="warn"/> -->
+    <!-- <Logger name="com.apimastery.config" level="error"/> -->
+
+    <!-- <Logger name="com.apisimulator" level="debug"/> -->
+    <!-- <Logger name="com.apisimulator" level="info"/> -->
+    <!-- <Logger name="com.apisimulator" level="warn"/> -->
+    <!-- <Logger name="com.apisimulator" level="error"/> -->
+
+    <!-- <Logger name="io.netty" level="debug"/> -->
+    <!-- <Logger name="io.netty" level="info"/> -->
+    <!-- <Logger name="io.netty" level="warn"/> -->
+    <!-- <Logger name="io.netty" level="error"/> -->
+
+    <!-- <Root level="debug"> -->
+    <Root level="info" includeLocation="false">
+      <!-- <Root level="warn"> -->
+      <!-- <Root level="error"> -->
+      
+      <AppenderRef ref="LOG_APPENDER" />
+    </Root>
+  </Loggers>
+
+</Configuration>

@@ -1,0 +1,114 @@
+request:
+- method: GET
+- uriPath: /airbnb/v2/listings
+
+Limit:
+  is: parameter
+  from: uriQueryParameter
+  named: _limit
+  eval: "return (_ != null && _.size() > 0 ? _[0] : 20)"
+
+UserID:
+  is: parameter
+  from: uriQueryParameter
+  named: user_id
+  eval: "return (_ != null && _.size() > 0 ? _[0] : null)"
+
+AccessToken:
+  is: parameter
+  from: header
+  named: X-Airbnb-OAuth-Token
+
+EnvironmentID:
+  is: parameter
+  from: constant
+  value: default
+
+EnvData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/environment.csv"
+  keys:
+  - EnvironmentID
+
+ListingData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/listing.csv"
+  keys:
+  - UserID
+
+LoggedIn:
+  is: Parameter
+  from: parameter
+  named: AccessToken
+  eval: return _ == ${ EnvData['AuthToken'] }
+
+ListingEmpty:
+  is: Parameter
+  from: constant
+  eval: return ${ ListingData['Listings'] } == "0"
+
+responses:
+# No Auth
+- when:
+    request:
+    - where: parameter
+      named: LoggedIn
+      equals: false
+  from: stub
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 401
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "auth_error.json"
+
+# Not Found
+- when:
+    request:
+    - where: parameter
+      named: ListingData
+      exists: false
+  from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "listings_empty.json"
+
+# Empty
+- when:
+    request:
+    - where: parameter
+      named: ListingEmpty
+      equals: true
+  from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "listings_empty.json"
+
+# Success
+- from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "listings.json"

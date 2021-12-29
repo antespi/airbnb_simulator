@@ -1,0 +1,77 @@
+request:
+  - method: POST
+  - uriPath: /airbnb/v2/oauth2/authorizations
+
+Token:
+  is: parameter
+  from: Body
+  element: ".refresh_token"
+
+CurrentDateTime:
+  is: parameter
+  from: dateTime
+
+NextDayTime:
+  is: parameter
+  from: parameter
+  named: CurrentDateTime
+  dependency:
+    kind: time
+    amount: 43200
+    unit: seconds
+
+ErrorID:
+  is: parameter
+  from: token
+  pattern: "[0-9a-f]{32}"
+
+EnvironmentID:
+  is: parameter
+  from: constant
+  value: default
+
+EnvData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/environment.csv"
+  keys:
+  - EnvironmentID
+
+ValidToken:
+  is: Parameter
+  from: parameter
+  named: Token
+  eval: return _ == ${EnvData['RefreshToken']}
+
+responses:
+# Token is valid
+- when:
+    request:
+    - where: parameter
+      named: ValidToken
+      equals: True
+
+  from: template
+  template: Simula
+  status: 200
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "valid.json"
+
+# Else: Token not found
+- from: template
+  template: Simula
+  code: 404
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "not_found.json"

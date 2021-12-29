@@ -1,0 +1,8 @@
+{
+    "expires_at": <% write(Math.round(NextDayTime / 1000)); %>,
+    "token": "${ Token }",
+    "token_type": "access_token",
+    "user_id": ${ EnvData['UserID'] },
+    "user_id_str": "${ EnvData['UserID'] }",
+    "valid": true
+}

@@ -1,0 +1,10 @@
+{
+    "listings": [],
+    "paging": {
+        "total_count": 0,
+        "limit": ${ Limit },
+        "prev_offset": null,
+        "next_offset": null,
+        "next_cursor": null
+    }
+}

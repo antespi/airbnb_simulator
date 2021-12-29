@@ -1,0 +1,92 @@
+ListingID:
+  is: parameter
+  from: uriPathPattern
+  pattern: /airbnb/v2/availability_rules/{listing_id}
+
+request:
+  - method: GET
+  - where: parameter
+    named: ListingID
+    not equals: null
+
+AccessToken:
+  is: parameter
+  from: header
+  named: X-Airbnb-OAuth-Token
+
+EnvironmentID:
+  is: parameter
+  from: constant
+  value: default
+
+EnvData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/environment.csv"
+  keys:
+  - EnvironmentID
+
+ListingData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/listing.csv"
+  keys:
+  - ListingID
+
+LoggedIn:
+  is: Parameter
+  from: parameter
+  named: AccessToken
+  eval: return _ == ${ EnvData['AuthToken'] }
+
+ErrorID:
+  is: parameter
+  from: token
+  pattern: "api_frwrk_[0-9a-f]{32}"
+
+responses:
+# No Auth
+- when:
+    request:
+    - where: parameter
+      named: LoggedIn
+      equals: False
+  from: stub
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 401
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "auth_error.json"
+
+# Not Found
+- when:
+    request:
+    - where: parameter
+      named: ListingData
+      exists: false
+  from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 404
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "obj_not_found.json"
+
+# Success
+- from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "availability_rules.json"

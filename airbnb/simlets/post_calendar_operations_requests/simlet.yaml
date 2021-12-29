@@ -1,0 +1,76 @@
+request:
+- method: POST
+- uriPath: /airbnb/v2/calendar_operations_requests
+
+AccessToken:
+  is: parameter
+  from: header
+  named: X-Airbnb-OAuth-Token
+
+EnvironmentID:
+  is: parameter
+  from: constant
+  value: default
+
+EnvData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/environment.csv"
+  keys:
+  - EnvironmentID
+
+LoggedIn:
+  is: Parameter
+  from: parameter
+  named: AccessToken
+  eval: return _ == ${ EnvData['AuthToken'] }
+
+responses:
+# No Auth
+- when:
+    request:
+    - where: parameter
+      named: LoggedIn
+      equals: False
+  from: stub
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 401
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "auth_error.json"
+
+# Success
+- when:
+    request:
+    - where: body
+      element: ".listing_id"
+      exists: true
+    - where: body
+      element: ".operations"
+      exists: true
+  from: stub
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "success.json"
+
+# Invalid
+- from: stub
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 400
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "invalid.json"

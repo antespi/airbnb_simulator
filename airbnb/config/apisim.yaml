@@ -1,0 +1,364 @@
+#----------------------------------------------------------------------
+# Default configuration for the Admin HTTP Server. 
+# The Admin enables the management of the API Simulator 
+# and API Simulation(s) via API calls over HTTP/S. 
+# Override all or only some of the settings, as needed.
+# Optional.
+#----------------------------------------------------------------------
+admin: http
+
+# By default, the Admin Server binds to 0.0.0.0 (anyLocalAddress) and
+# it will accept connections on any of host's IP addresses (network
+# interfaces). Set the host to localhost or 127.0.0.1 to restrict 
+# access to local clients only.
+# Optional.
+host: 0.0.0.0
+
+port: 6190
+
+security:
+  api:
+    # All calls to the Admin APIs must send the API Key as well.
+    # Set it to a blank or empty string value here to disable
+    # the security check. The default value is "apisimulator".
+    # Optional.
+    key: "apisimulator"
+  # MAYBE IN THE FUTURE
+  #ui:
+  #  oauth2:
+  #    ...
+
+# Admin Server TLS configuration for HTTPS connections.
+# By default it uses a JKS KeyStore found in the distro.
+# Optional.
+tls:
+  default:
+    keyStoreFile: "classpath:apisimulator.jks"
+    keyStorePassword: "storepass"
+    keyPassword: "keypass"
+  # Configure one of these three.
+  # keyStore takes precedence over selfSignedCert, which in turn
+  # takes precedence over certificate and private key in PEM format
+  #keyStore:
+    # Using ${sim.path} here is OK. ${simlets.path} and
+    # ${simlet.path}, however, are undefined and using
+    # them here will cause an error.
+    #
+    # Required when configuring a keyStore
+    #keyStoreFile: "${sim.path}/test_apisimulator.jks"
+    # Optional; if the keyStore is protected by a password
+    #keyStorePassword: "storepass"
+    # Optional; if the key is protected by a password
+    #keyPassword: "keypass"
+  # OR
+  # Self-signed certificate API Simulator will create at
+  # startup time and use, along with the corresponding
+  # private key, to establish TLS (HTTPS) connections.
+  #selfSignedCert:
+    # Fully-qualified domain name (FQDN) for the certificate.
+    # Required when configuring a self-signed certificate
+    #domain: test.apisimulation.com
+  # OR
+  # PEM-formatted certificate and private key
+  #pem:
+    # Passphrase-protected private key isn't supported. Decrypt
+    # the key first. For example: openssl pkcs8 \
+    # -in encrypted_private_key.key -out plain_private_key.pem
+    #
+    # Using ${sim.path} here is OK. ${simlets.path} and
+    # ${simlet.path}, however, are undefined and using
+    # them here will cause an error.
+    #
+    # Required when configuring PEM-formatted TLS artifacts
+    #certificate: "${sim.path}/test_certificate.pem"
+    # Required when configuring PEM-formatted TLS artifacts
+    #privateKey: "${sim.path}/test_private_key.pem"
+    # Don't specify key password here if the key is not protected by one!
+    #keyPassword:
+
+
+# Netty-specific server configuration
+# Optional.
+netty:
+  bossThreads: 1
+  workerThreads: 2
+  readTimeoutSeconds: 3
+
+
+# HTTP-specific configuration
+# Optional.
+http:
+  request:
+    codec:
+      maxInitialLineBytes: 1024
+      maxHeaderBytes: 8192
+      maxChunkBytes: 8192
+      maxContentBytes: 8388608 # 8MiB
+      initialBufferBytes: 256
+      validateHeaders: false
+
+
+# HTTP/2 protocol-specific configuration
+# Optional.
+http2:
+  maxConcurrentStreams: 100
+
+  # By default, headers in HTTP/2 requests are not validated
+  validateHeaders: false
+
+  # Max body size for plain-text HTTP/1.1 requests sent to
+  # the server and asking to upgrade the protocol to HTTP/2
+  upgradeRequestMaxContentBytes: 8388608 # 8MiB
+---
+#----------------------------------------------------------------------
+# Default HTTP API Simulator configuration.
+# The API Simulator hosts the API Simulation.
+# Optional.
+#----------------------------------------------------------------------
+simulator: http
+
+# API Simulator will bind to this host to listen for connections.
+# Useful when the host has multiple network interfaces. It defaults
+# to 0.0.0.0 (anyLocalAddress) if not defined or is blank.
+# Optional.
+#host: 127.0.0.1
+
+# API Simulator will listen on this port number for connections.
+# Optional.
+port: 6090
+
+
+# Server TLS configuration for HTTPS connections.
+# By default it uses a JKS KeyStore that comes with the distro.
+# Optional.
+tls:
+  default:
+    keyStoreFile: "classpath:apisimulator.jks"
+    keyStorePassword: "storepass"
+    keyPassword: "keypass"
+  # Configure one of these three for a simulation.
+  # keyStore takes precedence over selfSignedCert, which in turn
+  # takes precedence over certificate and private key in PEM format
+  #keyStore:
+    # Using ${sim.path} here is OK. ${simlets.path} and
+    # ${simlet.path}, however, are undefined and using
+    # them here will cause an error.
+    #
+    # Required when configuring a keyStore
+    #keyStoreFile: "classpath:apisimulator.jks"
+    # Optional; if the keyStore is protected by a password
+    #keyStorePassword: "storepass"
+    # Optional; if the key is protected by a password
+    #keyPassword: "keypass"
+  # OR
+  # Self-signed certificate API Simulator will create at
+  # startup time and use, along with the corresponding
+  # private key, to establish TLS (HTTPS) connections.
+  #selfSignedCert:
+    # Fully-qualified domain name (FQDN) for the certificate.
+    # Required when configuring a self-signed certificate
+    #domain: test.apisimulation.com
+  # OR
+  # PEM-formatted certificate and private key
+  #pem:
+    # Passphrase-protected private key isn't supported. Decrypt
+    # the key first. For example: openssl pkcs8 \
+    # -in encrypted_private_key.key -out plain_private_key.pem
+    #
+    # Using ${sim.path} here is OK. ${simlets.path} and
+    # ${simlet.path}, however, are undefined and using
+    # them here will cause an error.
+    #
+    # Required when configuring PEM-formatted TLS artifacts
+    #certificate: "${sim.path}/tls_certificate.pem"
+    # Required when configuring PEM-formatted TLS artifacts
+    #privateKey: "${sim.path}/tls_private_key.pem"
+    # Don't specify key password here if the key is not protected by one!
+    #keyPassword: keypass
+
+
+# Netty-specific server configuration
+# Optional.
+netty:
+  bossThreads: 1
+  workerThreads: 4
+  # How long the server will wait for data to arrive before
+  # timing out the read and returning "408 Request Timeout"
+  readTimeoutSeconds: 3
+
+
+# HTTP-specific configuration
+# Optional.
+http:
+  request:
+    codec:
+      maxInitialLineBytes: 4096
+      maxHeaderBytes: 8192
+      maxChunkBytes: 8192
+      maxContentBytes: 5242880 # 5MiB
+      initialBufferBytes: 256
+      validateHeaders: false
+
+
+# HTTP/2 protocol-specific configuration
+# Optional.
+http2:
+  maxConcurrentStreams: 101
+
+  # By default, headers in HTTP/2 requests are not validated
+  validateHeaders: false
+
+  # Max body size for plain-text HTTP/1.1 requests sent to
+  # the server and asking to upgrade the protocol to HTTP/2
+  upgradeRequestMaxContentBytes: 5242880 # 5MiB
+---
+#----------------------------------------------------------------------
+# Default configuration for HTTP simulations.
+#----------------------------------------------------------------------
+# The name is disregarded when loading simulation from a directory -
+# the name of the simulation directory becomes the simulation name
+# Required.
+simulation: airbnb
+
+# The default simlet to use when a request can't be matched.
+# Empty quoted string ("" or '') will cause unmatched requests
+# to be forwarded to the host specified in the request's Host
+# HTTP header. A blank value and null are disregarded
+defaultSimlet: apisimulator-simlet-404
+
+# Default character set to use for text simlets
+defaultCharset: UTF-8
+
+
+# Rendering simlet responses is asynchronous
+# and uses a separate thread pool
+# Optional.
+renderer:
+  threads: 8
+  maxPendingTasks: 500
+
+
+# HTTP-specific configuration
+# Optional.
+http:
+  request:
+    # For forwarding unmatched requests to the actual destination host
+    forwarder:
+      connectTimeoutMillis: 2000
+      readTimeoutMillis: 3000
+
+  # Callbacks in a Request/Acknowledge/Callback message
+  # exchange are async and use a separate thread pool.
+  callback:
+    # >= 0
+    coreThreads: 0
+    # 0 < maxThreads and maxThreads >= coreThreads
+    maxThreads: 4
+
+  response:
+    # The settings here will apply to all simlets but can be
+    # overridden per simlet, too.
+    # https://apisimulator.io/docs/latest/standalone-api-simulator/response-http-codec.html
+    codec:
+      # HTTP Server Name header.
+      # If not set, it will default to API Simulator's version
+      #serverName:
+
+      # The encoding to apply to the content and set as value in
+      # "Content-Encoding" header. The content encoding, per the
+      # HTTP 1.1 spec, is related to applying "gzip" or "deflate"
+      # compression.
+      # The encoding will be applied only if the request
+      # specifies that the client does accept that encoding and
+      # if the content isn't already encoded/compressed.
+      contentEncoding:
+
+      # The transfer encoding to apply to the content and set as
+      # value of "Transfer-Encoding" header, if:
+      # * the response doesn't already have non-empty
+      #   "Transfer-Encoding" header
+      # OR
+      # * the response's content is compressed (i.e. gzip/deflate
+      #   encoded) - then "chunked" transfer encoding is applied
+      #   automatically.
+      #
+      # Notice that when the response has non-empty
+      # "Transfer-Encoding" value then the content is expected to
+      # be <i>already</i> encoded using the method specified in
+      # the header's value (e.g. chunked).
+      transferEncoding:
+
+      # Flag if the connection is to be always closed
+      # regardless of whether the client is requesting
+      # or not 'Connection: keep-alive'
+      alwaysCloseConnection: false
+
+      maxInitialLineBytes: 1024
+      maxHeaderBytes: 8192
+      maxChunkBytes: 10240
+      maxContentBytes: 10485760
+
+      setDateWhenMissing: true
+      setDateWhenPresent: false
+
+
+# Bounded LRU KV (Key/Value) Stores for stateful simulations.
+# The maximum number of elements in each Store is limited and
+# reaching the maximum leads to the Least Recently Used (LRU)
+# element to be removed, much like a cache. 
+# You don't have to declare KV Stores here unless you want
+# them to have more than the default maximum number of slots. 
+# The default for maximum number of slots is 64.
+# The name for the store can be any combination of letters, 
+# digits, dash, and underscore, and should not start with an
+# underscore.
+# KV Stores are not distributed but local to the API Simulator
+# instance.
+# Optional
+#kvStores:
+#  - name: <name-for-the-store>
+#    slots: <max-count>
+#  - name: <name2>
+#    slots: <max-count-2>
+---
+#----------------------------------------------------------------------
+# Default Built-In Simlet
+#----------------------------------------------------------------------
+simlet: apisimulator-simlet-404
+
+# The lowest rank -2^31
+rank: -2147483648
+
+
+# This simlet matches no request
+request: none
+
+
+response:
+  from: stub
+  status: 404
+  headers:
+  - "Content-Type: application/text; charset=UTF-8"
+  body: "API Simulator couldn't find a matching simlet for the request."
+---
+#----------------------------------------------------------------------
+# Simlet for simulating OK response to HTTP CONNECT requests when API
+# Simulator is called as a HTTP/S proxy.
+#----------------------------------------------------------------------
+simlet: apisimulator-proxy-connect
+
+# The lowest rank is -2^31 = -2147483648.
+# -2147483648 + 100 = -2147483548
+rank: -2147483548
+
+
+request:
+- method: CONNECT
+
+
+response:
+  from: stub
+  status: 200
+  headers:
+  - "Connection: keep-alive"
+---
