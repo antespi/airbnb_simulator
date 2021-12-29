@@ -6,6 +6,7 @@ services:
     environment:
       APISIMULATOR_LOG_LEVEL: debug
       APISIMULATOR_ACCESS_LOG: file
+      APISIMULATOR_CONFIG_DIRS: /apisimulator/apisimulator-http-1.9/airbnb/config
     ports:
       - 6190:6190
       - 6090:6090
