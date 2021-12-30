@@ -65,7 +65,7 @@ responses:
       path: "${ simlet.path }"
       name: "valid.json"
 
-# Else: Token not found
+# Token not found
 - from: template
   template: Simula
   code: 404
@@ -75,5 +75,5 @@ responses:
   body:
     type: text
     file: 
-      path: "${ simlet.path }"
+      path: "${ sim.path }/common"
       name: "not_found.json"

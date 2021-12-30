@@ -1,0 +1,9 @@
+{
+    "listing_seasonal_rule_set_timelines": [
+        {
+            "listing_id": ${ ListingID },
+            "rule_group_timeline": [],
+            "listing_id_str": "${ ListingID }"
+        }
+    ]
+}

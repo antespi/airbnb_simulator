@@ -1,12 +1,14 @@
-ListingID:
+UserID:
   is: parameter
-  from: uriPathPattern
-  pattern: /airbnb/v2/availability_rules/{listing_id}
+  from: uriQueryParameter
+  named: host_id
+  eval: "return (_ != null && _.size() > 0 ? _[0] : null)"
 
 request:
   - method: GET
+  - uriPath: /airbnb/v2/reservations
   - where: parameter
-    named: ListingID
+    named: UserID
     not equals: null
 
 AccessToken:
@@ -31,13 +33,18 @@ ListingData:
   from: csv
   file: "${sim.path}/data/listing.csv"
   keys:
-  - ListingID
+  - UserID
 
 LoggedIn:
   is: Parameter
   from: parameter
   named: AccessToken
   eval: return _ == ${ EnvData['AuthToken'] }
+
+NoAccess:
+  is: Parameter
+  from: constant
+  eval: return ${ ListingData['Listings'] } == "0"
 
 ErrorID:
   is: parameter
@@ -50,7 +57,7 @@ responses:
     request:
     - where: parameter
       named: LoggedIn
-      equals: False
+      equals: false
   from: stub
   headers:
   - "Content-Type: application/json; charset=UTF-8"
@@ -79,6 +86,23 @@ responses:
       path: "${ sim.path }/common"
       name: "obj_not_found.json"
 
+# No Access
+- when:
+    request:
+    - where: parameter
+      named: NoAccess
+      equals: true
+  from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 403
+  body:
+    type: text
+    file: 
+      path: "${ sim.path }/common"
+      name: "no_access.json"
+
 # Success
 - from: template
   headers:
@@ -89,4 +113,4 @@ responses:
     type: text
     file: 
       path: "${ simlet.path }"
-      name: "availability_rules.json"
+      name: "reservations.json"

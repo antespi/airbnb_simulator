@@ -59,7 +59,7 @@ responses:
   body:
     type: text
     file: 
-      path: "${ simlet.path }"
+      path: "${ sim.path }/common"
       name: "auth_error.json"
 
 # Not Found
@@ -76,7 +76,7 @@ responses:
   body:
     type: text
     file: 
-      path: "${ simlet.path }"
+      path: "${ sim.path }/common"
       name: "obj_not_found.json"
 
 # Success

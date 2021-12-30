@@ -1,0 +1,7 @@
+{
+    "reservations": [],
+    "paging": {
+        "limit": ${ Limit },
+        "next_cursor": null
+    }
+}

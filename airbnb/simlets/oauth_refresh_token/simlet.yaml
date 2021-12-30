@@ -73,5 +73,5 @@ responses:
   body:
     type: text
     file: 
-      path: "${ simlet.path }"
+      path: "${ sim.path }/common"
       name: "not_found.json"

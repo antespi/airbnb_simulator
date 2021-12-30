@@ -1,0 +1,12 @@
+{
+    "seasonal_rule_set": {
+        "id": ${ RuleID },
+        "color": ${ Color },
+        "created_by_user_id": ${ EnvData['UserID'] },
+        "pricing_rules": [],
+        "availability_rules": null,
+        "title": "${ Title }",
+        "id_str": "${ RuleID }",
+        "created_by_user_id_str": "${ EnvData['UserID'] }"
+    }
+}

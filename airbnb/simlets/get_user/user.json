@@ -1,0 +1,9 @@
+{
+    "user": {
+        "first_name": "${ ListingData['FirstName'] }",
+        "id": ${ UserID },
+        "picture_url": "https://a0.muscache.com/im/pictures/user/${ ListingData['Picture'] }.jpg?aki_policy=profile_x_medium",
+        "picture_url_large": "https://a0.muscache.com/im/pictures/user/${ ListingData['Picture'] }.jpg?aki_policy=profile_large",
+        "id_str": "${ UserID }"
+    }
+}

@@ -1,12 +1,12 @@
-ListingID:
+UserID:
   is: parameter
   from: uriPathPattern
-  pattern: /airbnb/v2/availability_rules/{listing_id}
+  pattern: /airbnb/v2/users/{user_id}
 
 request:
   - method: GET
   - where: parameter
-    named: ListingID
+    named: UserID
     not equals: null
 
 AccessToken:
@@ -31,7 +31,7 @@ ListingData:
   from: csv
   file: "${sim.path}/data/listing.csv"
   keys:
-  - ListingID
+  - UserID
 
 LoggedIn:
   is: Parameter
@@ -50,7 +50,7 @@ responses:
     request:
     - where: parameter
       named: LoggedIn
-      equals: False
+      equals: false
   from: stub
   headers:
   - "Content-Type: application/json; charset=UTF-8"
@@ -89,4 +89,4 @@ responses:
     type: text
     file: 
       path: "${ simlet.path }"
-      name: "availability_rules.json"
+      name: "user.json"

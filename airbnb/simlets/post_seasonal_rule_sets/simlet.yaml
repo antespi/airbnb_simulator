@@ -1,13 +1,6 @@
-ListingID:
-  is: parameter
-  from: uriPathPattern
-  pattern: /airbnb/v2/availability_rules/{listing_id}
-
 request:
-  - method: GET
-  - where: parameter
-    named: ListingID
-    not equals: null
+- method: POST
+- uriPath: /airbnb/v2/seasonal_rule_sets
 
 AccessToken:
   is: parameter
@@ -26,23 +19,37 @@ EnvData:
   keys:
   - EnvironmentID
 
-ListingData:
-  is: parameter
-  from: csv
-  file: "${sim.path}/data/listing.csv"
-  keys:
-  - ListingID
-
 LoggedIn:
   is: Parameter
   from: parameter
   named: AccessToken
   eval: return _ == ${ EnvData['AuthToken'] }
 
-ErrorID:
+javascriptExecutor:
+  is: scriptExecutor
+  lang: javascript
+  libs:
+  - "${sim.path}/scripts"
+
+Color:
   is: parameter
-  from: token
-  pattern: "api_frwrk_[0-9a-f]{32}"
+  from: Body
+  as: byte
+  element: ".color"
+  default: null
+
+Title:
+  is: parameter
+  from: Body
+  element: ".title"
+  default: ""
+
+RuleID:
+  is: parameter
+  from: number
+  range:
+    min: 356123456
+    max: 987123456
 
 responses:
 # No Auth
@@ -62,23 +69,6 @@ responses:
       path: "${ sim.path }/common"
       name: "auth_error.json"
 
-# Not Found
-- when:
-    request:
-    - where: parameter
-      named: ListingData
-      exists: false
-  from: template
-  headers:
-  - "Content-Type: application/json; charset=UTF-8"
-
-  status: 404
-  body:
-    type: text
-    file: 
-      path: "${ sim.path }/common"
-      name: "obj_not_found.json"
-
 # Success
 - from: template
   headers:
@@ -89,4 +79,4 @@ responses:
     type: text
     file: 
       path: "${ simlet.path }"
-      name: "availability_rules.json"
+      name: "seasonal_rule_set_created.json"

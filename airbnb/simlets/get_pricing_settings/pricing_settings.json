@@ -1,0 +1,27 @@
+{
+    "pricing_setting": {
+        "cleaning_fee": null,
+        "default_daily_price": 202,
+        "eligible_for_pass_through_taxes": true,
+        "guests_included": 1,
+        "listing_currency": "EUR",
+        "listing_id": ${ ListingID },
+        "monthly_price_factor": null,
+        "price_per_extra_person": 0,
+        "security_deposit": null,
+        "standard_fees": [],
+        "pass_through_taxes": [],
+        "pass_through_taxes_collection_type": "NO_AIRBNB_COLLECTED_TAX",
+        "weekend_price": null,
+        "weekly_price_factor": 0.010000000000000009,
+        "default_pricing_rules": [
+            {
+                "threshold_one": 7,
+                "rule_type": "STAYED_AT_LEAST_X_DAYS",
+                "price_change_type": "PERCENT",
+                "price_change": -99.0
+            }
+        ],
+        "listing_id_str": "${ ListingID }"
+    }
+}

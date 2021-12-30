@@ -1,10 +1,10 @@
 ListingID:
   is: parameter
   from: uriPathPattern
-  pattern: /airbnb/v2/availability_rules/{listing_id}
+  pattern: /airbnb/v2/listing_seasonal_rule_set_timelines/{listing_id}
 
 request:
-  - method: GET
+  - method: PUT
   - where: parameter
     named: ListingID
     not equals: null
@@ -38,6 +38,11 @@ LoggedIn:
   from: parameter
   named: AccessToken
   eval: return _ == ${ EnvData['AuthToken'] }
+
+NoAccess:
+  is: Parameter
+  from: constant
+  eval: return ${ ListingData['Listings'] } == "0"
 
 ErrorID:
   is: parameter
@@ -79,6 +84,23 @@ responses:
       path: "${ sim.path }/common"
       name: "obj_not_found.json"
 
+# No Access
+- when:
+    request:
+    - where: parameter
+      named: NoAccess
+      equals: true
+  from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 403
+  body:
+    type: text
+    file: 
+      path: "${ sim.path }/common"
+      name: "no_access.json"
+
 # Success
 - from: template
   headers:
@@ -89,4 +111,4 @@ responses:
     type: text
     file: 
       path: "${ simlet.path }"
-      name: "availability_rules.json"
+      name: "listing_seasonal_rule_set_timelines.json"
