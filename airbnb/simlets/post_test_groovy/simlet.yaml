@@ -1,0 +1,53 @@
+request:
+- method: POST
+- uriPath: /airbnb/v2/test_groovy
+
+groovyExecutor:
+  is: scriptExecutor
+  lang: groovy
+  libs:
+  - "${sim.path}/scripts/groovy"
+
+Object:
+  is: parameter
+  from: Body
+  element: ".object"
+  default: null
+
+ObjectScript:
+  is: script
+  executor: groovyExecutor
+  expression: "obj2Json('Object')"
+
+ObjectJSON:
+  is: parameter 
+  from: script
+  script: "ObjectScript"
+
+Array:
+  is: parameter
+  from: Body
+  element: ".array"
+  default: []
+
+ArrayScript:
+  is: script
+  executor: groovyExecutor
+  expression: "obj2Json('Array')"
+
+ArrayJSON:
+  is: parameter 
+  from: script
+  script: "ArrayScript"
+
+response:
+  from: template
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "object_created.json"

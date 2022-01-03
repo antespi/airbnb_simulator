@@ -1,0 +1,148 @@
+request:
+- method: POST
+- uriPath: /airbnb/v2/test_webhook
+
+EnvironmentID:
+  is: parameter
+  from: constant
+  value: default
+
+EnvData:
+  is: parameter
+  from: csv
+  file: "${sim.path}/data/environment.csv"
+  keys:
+  - EnvironmentID
+
+groovyExecutor:
+  is: scriptExecutor
+  lang: groovy
+  libs:
+  - "${sim.path}/scripts/groovy"
+
+Object:
+  is: parameter
+  from: Body
+  element: ".object"
+  default: null
+
+ObjectScript:
+  is: script
+  executor: groovyExecutor
+  expression: "obj2Json('Object')"
+
+ObjectJSON:
+  is: parameter 
+  from: script
+  script: "ObjectScript"
+
+Array:
+  is: parameter
+  from: Body
+  element: ".array"
+  default: []
+
+ArrayScript:
+  is: script
+  executor: groovyExecutor
+  expression: "obj2Json('Array')"
+
+ArrayJSON:
+  is: parameter 
+  from: script
+  script: "ArrayScript"
+
+Signature:
+  is: parameter 
+  from: script
+  script: "SignatureScript"
+
+WebhookHost:
+  is: parameter
+  from: constant
+  value: webhook.site
+
+WebhookUrl:
+  is: parameter
+  from: constant
+  value: /4ea1c721-b5ab-4af5-bfaf-e8c7a5056336
+
+WebhookMethod:
+  is: parameter
+  from: constant
+  value: POST
+
+WebhookDate:
+  is: parameter
+  from: template
+  template: Simula
+  text: ${ _dateTime.format(_dateTime.now(), 'E, dd MMM yyyy HH:mm:ss \'GMT\'', 'GMT') }
+
+WebhookContentType:
+  is: parameter
+  from: constant
+  value: application/json
+
+WebhookBody:
+  is: parameter
+  from: template
+  template: Simula
+  text: `
+{
+    "action": "reservation_acceptance_confirmation",
+    "reservation": {
+        "confirmation_code": "HMQBQNB2K4"
+    }
+}
+`
+
+PkFilePath:
+  is: parameter
+  from: template
+  template: Simula
+  text: ${ sim.path }/config/key_pkcs8.pem
+
+SignatureScript:
+  is: script
+  executor: groovyExecutor
+  expression: "webhookSignature('WebhookHost', 'WebhookUrl', 'WebhookMethod', 'WebhookDate', 'WebhookContentType', 'WebhookBody', 'PkFilePath')"
+
+response:
+  from: template
+  template: Simula
+  headers:
+  - "Content-Type: application/json; charset=UTF-8"
+
+  status: 200
+  body:
+    type: text
+    file: 
+      path: "${ simlet.path }"
+      name: "object_created.json"
+
+  callback:
+    delay:
+      timeUnit: milliseconds
+      random:
+        min: 500
+        max: 1500
+    http1:
+      from: template
+      template: Simula
+      method: ${ WebhookMethod }
+      uri:
+        scheme: https
+        host: ${ WebhookHost }
+        port: 443
+        path: ${ WebhookUrl }
+      headers:
+        - name: Date
+          value: ${ WebhookDate }
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: ${ WebhookContentType }
+        - name: Authorization
+          # value: 'Signature keyId="booking_web_hooks",algorithm="rsa-sha256",headers="host url method date content-type body",delimiter="|",signature="QA2+OK+k2DrQ0pYIN6hnGn3n0hGcxMRUxMEJEzFKHSUp5671S0F2717HLtnbS64p1igT9pXom0FcTOm4aYF+66qZeps6VD18A8A0AEDVY+avfG+LiHNrD4Fl2yZ0qkykh5BQ2VI1/4PVjGktAc2//EX2WDMkn9G5+U6FWstVSSd3BJ0ZYSNN5DmLyRLXaB+PCgzqHA2Ojjc8zifGB0/r7xBLXZb18nrnKIocKhApZyEekAkxJNdrRAHi7VKZp3kGyKei3mZE/NzllBUoRfMERuct7d0/aWVCg0xqYcdTYohXPHS0zaMENYrjU90sc0K55mXIVYFLNvdAXdODvmsQTw=="'
+          value: ${ Signature }
+      body: ${ WebhookBody }

@@ -1,0 +1,5 @@
+{
+    "object": ${ ObjectJSON },
+    "array": ${ ArrayJSON },
+    "sha256": ${ Signature }
+}

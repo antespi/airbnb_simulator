@@ -1,0 +1,4 @@
+{
+    "object": ${ ObjectJSON },
+    "array": ${ ArrayJSON }
+}
